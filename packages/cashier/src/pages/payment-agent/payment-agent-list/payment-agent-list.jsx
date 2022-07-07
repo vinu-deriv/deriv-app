@@ -27,9 +27,19 @@ const PaymentAgentList = ({
     setSideNotes,
     verification_code,
 }) => {
+    const [scroll, setScroll] = React.useState(false);
+    const fieldRef = React.useRef(null);
+
     React.useEffect(() => {
         onMount();
     }, [onMount]);
+
+    const scrollWrapper = scroll_flag => {
+        if (scroll) {
+            fieldRef.current.scrollIntoView();
+        }
+        setScroll(scroll_flag);
+    };
 
     React.useEffect(() => {
         if (typeof setSideNotes === 'function' && !is_loading) {
@@ -38,7 +48,12 @@ const PaymentAgentList = ({
     }, [is_loading, is_try_withdraw_successful]);
 
     return (
-        <div className='payment-agent-list cashier__wrapper--align-left'>
+        <div
+            ref={fieldRef}
+            className={`payment-agent-list cashier__wrapper--align-left ${
+                scroll ? 'payment-agent-list__scroll' : 'payment-agent-list__unset-scroll'
+            }`}
+        >
             <div
                 className={classNames('payment-agent-list__instructions', {
                     'payment-agent-list__instructions-hide-tabs': is_try_withdraw_successful,
@@ -55,7 +70,7 @@ const PaymentAgentList = ({
                         {is_loading ? (
                             <Loading is_fullscreen={false} />
                         ) : (
-                            <PaymentAgentDepositWithdrawContainer is_deposit />
+                            <PaymentAgentDepositWithdrawContainer is_deposit setScroll={setScroll} />
                         )}
                     </div>
                     <div label={localize('Withdrawal')}>
@@ -75,7 +90,10 @@ const PaymentAgentList = ({
                                     </div>
                                 ) : (
                                     (verification_code || is_payment_agent_withdraw) && (
-                                        <PaymentAgentDepositWithdrawContainer verification_code={verification_code} />
+                                        <PaymentAgentDepositWithdrawContainer
+                                            verification_code={verification_code}
+                                            setScroll={scrollWrapper}
+                                        />
                                     )
                                 )}
                             </div>

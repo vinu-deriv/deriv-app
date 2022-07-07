@@ -21,6 +21,7 @@ const PaymentAgentDepositWithdrawContainer = ({
     selected_bank,
     supported_banks,
     verification_code,
+    setScroll,
 }) => {
     React.useEffect(() => {
         return () => {
@@ -35,6 +36,14 @@ const PaymentAgentDepositWithdrawContainer = ({
             onChangePaymentMethod({ target: { value: '0' } });
         };
     }, []);
+
+    React.useEffect(() => {
+        if (is_try_withdraw_successful) {
+            setScroll(is_try_withdraw_successful);
+        } else {
+            setScroll(is_try_withdraw_successful);
+        }
+    }, [is_try_withdraw_successful]);
 
     const [is_unlisted_withdraw, setIsUnlistedWithdraw] = React.useState(false);
 
@@ -143,6 +152,7 @@ PaymentAgentDepositWithdrawContainer.propTypes = {
     selected_bank: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     supported_banks: MobxPropTypes.arrayOrObservableArray,
     verification_code: PropTypes.string,
+    setScroll: PropTypes.func,
 };
 
 export default connect(({ modules }) => ({
