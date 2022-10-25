@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import CryptoFiatConverter from '../crypto-fiat-converter';
 import { Formik } from 'formik';
 import * as formik from 'formik';
+import { StoreProvider } from '../../../hooks';
 
 jest.mock('Stores/connect.js', () => ({
     __esModule: true,
@@ -11,21 +12,43 @@ jest.mock('Stores/connect.js', () => ({
 }));
 
 describe('<CryptoFiatConverter />', () => {
-    const mockProps = () => ({
+    let mockRootStore;
+    beforeEach(() => {
+        mockRootStore = {
+            modules: {
+                cashier: {
+                    crypto_fiat_converter: {
+                        converter_from_amount: 100,
+                        converter_to_amount: 200,
+                        is_timer_visible: true,
+                    },
+                },
+            },
+        };
+    });
+    const props = {
         from_currency: 'BTC',
         hint: 'Transfer limits',
-        is_timer_visible: true,
         resetConverter: jest.fn(),
         to_currency: 'USD',
-    });
+        onChangeConverterFromAmount: jest.fn(),
+        onChangeConverterToAmount: jest.fn(),
+        validateFromAmount: jest.fn(),
+        validateToAmount: jest.fn(),
+    };
 
-    it('should show the proper hints and labels', () => {
-        const props = mockProps();
+    const renderCryptoFiatConverter = () =>
         render(
             <Formik>
                 <CryptoFiatConverter {...props} />
-            </Formik>
+            </Formik>,
+            {
+                wrapper: ({ children }) => <StoreProvider store={mockRootStore}>{children}</StoreProvider>,
+            }
         );
+
+    it('should show the proper hints and labels', () => {
+        renderCryptoFiatConverter();
 
         expect(screen.getByText('Amount (BTC)')).toBeInTheDocument();
         expect(screen.getByText('Amount (USD)')).toBeInTheDocument();
@@ -35,12 +58,7 @@ describe('<CryptoFiatConverter />', () => {
     });
 
     it('should change arrow direction when the focus changes between inputs', () => {
-        const props = mockProps();
-        render(
-            <Formik>
-                <CryptoFiatConverter {...props} />
-            </Formik>
-        );
+        renderCryptoFiatConverter();
 
         const [converter_from_amount_input, converter_to_amount_input] = screen.getAllByRole('textbox');
         converter_from_amount_input.focus();
@@ -50,12 +68,7 @@ describe('<CryptoFiatConverter />', () => {
     });
 
     it('"converter_from_amount" and "converter_to_amount" inputs should show the proper values', () => {
-        const props = mockProps();
-        render(
-            <Formik>
-                <CryptoFiatConverter {...props} converter_from_amount={'100'} converter_to_amount={'200'} />
-            </Formik>
-        );
+        renderCryptoFiatConverter();
         const [converter_from_amount_input, converter_to_amount_input] = screen.getAllByRole('textbox');
 
         expect(converter_from_amount_input).toHaveValue('100');
@@ -63,28 +76,15 @@ describe('<CryptoFiatConverter />', () => {
     });
 
     it('should trigger onChange callback when the input field changes', () => {
-        const props = mockProps();
-        const onChangeConverterFromAmount = jest.fn();
-        const onChangeConverterToAmount = jest.fn();
         const use_formik_context = jest.spyOn(formik, 'useFormikContext') as any;
         use_formik_context.mockReturnValueOnce({ handleChange: jest.fn() });
-        render(
-            <Formik>
-                <CryptoFiatConverter
-                    {...props}
-                    converter_from_amount={'100'}
-                    converter_to_amount={'200'}
-                    onChangeConverterFromAmount={onChangeConverterFromAmount}
-                    onChangeConverterToAmount={onChangeConverterToAmount}
-                />
-            </Formik>
-        );
+        renderCryptoFiatConverter();
         const [converter_from_amount_input, converter_to_amount_input] = screen.getAllByRole('textbox');
         fireEvent.change(converter_from_amount_input, { target: { value: '2000' } });
         fireEvent.change(converter_to_amount_input, { target: { value: '3000' } });
 
-        expect(onChangeConverterFromAmount).toHaveBeenCalledTimes(1);
-        expect(onChangeConverterToAmount).toHaveBeenCalledTimes(1);
+        expect(props.onChangeConverterFromAmount).toHaveBeenCalledTimes(1);
+        expect(props.onChangeConverterToAmount).toHaveBeenCalledTimes(1);
 
         use_formik_context.mockRestore();
     });
