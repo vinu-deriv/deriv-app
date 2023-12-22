@@ -23,10 +23,6 @@ export type TQuestionnaireModal = {
 
 const QuestionnaireModal = ({ ab_questionnaire, handleSignup }: TQuestionnaireModal) => {
     const a_variant = !!ab_questionnaire.answers?.[0]?.header;
-    const shuffled_questionnaire = ab_questionnaire?.show_answers_in_random_order
-        ? shuffleArray(ab_questionnaire.answers)
-        : ab_questionnaire.answers;
-
     React.useEffect(() => {
         Analytics.trackEvent('ce_questionnaire_form', {
             action: 'open',
@@ -57,13 +53,13 @@ const QuestionnaireModal = ({ ab_questionnaire, handleSignup }: TQuestionnaireMo
                     'questionnaire-modal__options': !a_variant,
                 })}
             >
-                {shuffled_questionnaire.map(({ code, text, header }, index) => {
+                {ab_questionnaire?.answers.map(({ code, text, header }, index) => {
                     return (
                         <Button
                             key={`${code}_questionnaire`}
                             data-testid={`${code}_questionnaire`}
                             onClick={() =>
-                                onClickAnswer(code, index, { answer_content: shuffled_questionnaire[index] })
+                                onClickAnswer(code, index + 1, { answer_content: ab_questionnaire?.answers[index] })
                             }
                             style={{ height: 'unset', padding: 'unset' }}
                             transparent

@@ -3,7 +3,7 @@ import { Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
 
 import { Button, Checkbox, Dialog, Loading, Text } from '@deriv/components';
-import { getLocation, SessionStore } from '@deriv/shared';
+import { getLocation, SessionStore, shuffleArray } from '@deriv/shared';
 import { getLanguage, localize } from '@deriv/translations';
 import { Analytics } from '@deriv/analytics';
 
@@ -37,10 +37,9 @@ const AccountSignup = ({
     const [is_password_modal, setIsPasswordModal] = React.useState(false);
     const [is_disclaimer_accepted, setIsDisclaimerAccepted] = React.useState(false);
     const [is_questionnaire, setIsQuestionnaire] = React.useState(false);
+    const [ab_questionnaire, setABQuestionnaire] = React.useState(null);
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
-    let ab_questionnaire = Analytics.getFeatureValue('questionnaire-config', 'inactive');
-    ab_questionnaire = ab_questionnaire?.[language] ?? ab_questionnaire?.EN ?? ab_questionnaire;
 
     const checkResidenceIsBrazil = selected_country =>
         selected_country && residence_list[indexOfSelection(selected_country)]?.value?.toLowerCase() === 'br';
@@ -64,6 +63,17 @@ const AccountSignup = ({
             }
             setIsLoading(false);
         });
+        (async () => {
+            let ab_value = await Analytics.getFeatureValue('questionnaire-config', 'inactive');
+            ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
+            if (ab_value?.show_answers_in_random_order) {
+                ab_value = {
+                    ...ab_value,
+                    answers: shuffleArray(ab_value.answers),
+                };
+            }
+            setABQuestionnaire(ab_value);
+        })();
 
         Analytics.trackEvent('ce_virtual_signup_form', {
             action: 'signup_confirmed',
