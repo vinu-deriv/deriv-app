@@ -40,6 +40,7 @@ const AccountSignup = ({
     const [ab_questionnaire, setABQuestionnaire] = React.useState(null);
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
+    console.log(ab_questionnaire);
 
     const checkResidenceIsBrazil = selected_country =>
         selected_country && residence_list[indexOfSelection(selected_country)]?.value?.toLowerCase() === 'br';
