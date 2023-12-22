@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Analytics } from '@deriv/analytics';
-import { shuffleArray } from '@deriv/shared';
 import { Button, Text } from '@deriv/components';
 import './questionnaire-modal.scss';
 
@@ -58,7 +57,6 @@ const QuestionnaireModal = ({ ab_questionnaire, handleSignup }: TQuestionnaireMo
                             key={`${code}_questionnaire`}
                             data-testid={`${code}_questionnaire`}
                             onClick={() => onClickAnswer(code, index + 1)}
-                            style={{ height: 'unset', padding: 'unset' }}
                             transparent
                         >
                             <li

@@ -14,7 +14,7 @@ describe('QuestionnaireModal', () => {
                 show_answers_in_random_order: true,
                 answers: [
                     { code: 'a', text: 'Default A' },
-                    { code: 'b', text: 'Default B', header: 'Default B' },
+                    { code: 'b', text: 'Default B', header: 'Default Header B' },
                 ],
             },
             {

@@ -37,9 +37,7 @@ const AccountSignup = ({
     const [is_password_modal, setIsPasswordModal] = React.useState(false);
     const [is_disclaimer_accepted, setIsDisclaimerAccepted] = React.useState(false);
     const [is_questionnaire, setIsQuestionnaire] = React.useState(false);
-    const [ab_questionnaire, setABQuestionnaire] = React.useState(
-        Analytics.getFeatureValue('questionnaire-config', 'inactive')
-    );
+    const [ab_questionnaire, setABQuestionnaire] = React.useState();
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
 
@@ -66,20 +64,22 @@ const AccountSignup = ({
             setIsLoading(false);
         });
         // need to modify data from ab testing platform to reach translation and tracking needs
-        (() => {
-            let ab_value = ab_questionnaire;
+        const fetchQuestionnarieData = () => {
+            let ab_value = Analytics.getFeatureValue('questionnaire-config', 'inactive');
+            const default_ab_value = ab_value;
             ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
             if (ab_value?.show_answers_in_random_order) {
                 ab_value = [
-                    { ...ab_questionnaire.default },
+                    { ...default_ab_value.default },
                     {
                         ...ab_value,
                         answers: shuffleArray(ab_value.answers),
                     },
                 ];
-            } else if (ab_value !== 'inactive') ab_value = [{ ...ab_questionnaire.default }, { ...ab_value }];
-            setABQuestionnaire(ab_value);
-        })();
+            } else if (ab_value !== 'inactive') ab_value = [{ ...default_ab_value.default }, { ...ab_value }];
+            return ab_value;
+        };
+        setABQuestionnaire(fetchQuestionnarieData());
 
         Analytics.trackEvent('ce_virtual_signup_form', {
             action: 'signup_confirmed',
