@@ -98,25 +98,22 @@ const AccountSignup = ({
 
     const handleSignup = () => onSignup(modded_state, onSignupComplete);
 
-    const onSignupPassthrough = React.useCallback(
-        values => {
-            const index_of_selected_residence = indexOfSelection(values.residence);
-            const index_of_selected_citizenship = indexOfSelection(values.citizenship);
+    const onSignupPassthrough = values => {
+        const index_of_selected_residence = indexOfSelection(values.residence);
+        const index_of_selected_citizenship = indexOfSelection(values.citizenship);
 
-            const modded_values = {
-                ...values,
-                residence: residence_list[index_of_selected_residence].value,
-                citizenship: residence_list[index_of_selected_citizenship].value,
-            };
-            setModdedState(modded_values);
+        const modded_values = {
+            ...values,
+            residence: residence_list[index_of_selected_residence].value,
+            citizenship: residence_list[index_of_selected_citizenship].value,
+        };
+        setModdedState(modded_values);
 
-            // a/b test
-            ab_questionnaire === 'inactive'
-                ? onSignup(modded_values, onSignupComplete)
-                : setIsQuestionnaire(!!ab_questionnaire);
-        },
-        [ab_questionnaire]
-    );
+        // a/b test
+        ab_questionnaire === 'inactive'
+            ? onSignup(modded_values, onSignupComplete)
+            : setIsQuestionnaire(!!ab_questionnaire);
+    };
 
     const onSignupComplete = error => {
         if (error) {
