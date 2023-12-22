@@ -42,7 +42,6 @@ const AccountSignup = ({
     );
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
-    console.log(ab_questionnaire);
 
     const checkResidenceIsBrazil = selected_country =>
         selected_country && residence_list[indexOfSelection(selected_country)]?.value?.toLowerCase() === 'br';
@@ -66,6 +65,7 @@ const AccountSignup = ({
             }
             setIsLoading(false);
         });
+        // need to modify data from ab testing platform to reach translation and tracking needs
         (() => {
             let ab_value = ab_questionnaire;
             ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
@@ -77,7 +77,7 @@ const AccountSignup = ({
                         answers: shuffleArray(ab_value.answers),
                     },
                 ];
-            } else ab_value = [{ ...ab_questionnaire.default }, { ...ab_value }];
+            } else if (ab_value !== 'inactive') ab_value = [{ ...ab_questionnaire.default }, { ...ab_value }];
             setABQuestionnaire(ab_value);
         })();
 

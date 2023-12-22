@@ -7,15 +7,26 @@ import crypto from 'crypto';
 
 describe('QuestionnaireModal', () => {
     const mock_props = {
-        ab_questionnaire: {
-            id: '1',
-            question: 'Sample question',
-            show_answers_in_random_order: false,
-            answers: [
-                { code: 'a', text: 'Option A' },
-                { code: 'b', text: 'Option B', header: 'Header B' },
-            ],
-        },
+        ab_questionnaire: [
+            {
+                id: '1',
+                question: 'Default question',
+                show_answers_in_random_order: true,
+                answers: [
+                    { code: 'a', text: 'Default A' },
+                    { code: 'b', text: 'Default B', header: 'Default B' },
+                ],
+            },
+            {
+                id: '1',
+                question: 'Sample question',
+                show_answers_in_random_order: false,
+                answers: [
+                    { code: 'a', text: 'Option A' },
+                    { code: 'b', text: 'Option B', header: 'Header B' },
+                ],
+            },
+        ],
         handleSignup: jest.fn(),
     };
 
