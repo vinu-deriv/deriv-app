@@ -71,10 +71,13 @@ const AccountSignup = ({
             let ab_value = ab_questionnaire;
             ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
             if (ab_value?.show_answers_in_random_order) {
-                ab_value = {
-                    ...ab_value,
-                    answers: shuffleArray(ab_value.answers),
-                };
+                ab_value = [
+                    { ...ab_questionnaire['default'] },
+                    {
+                        ...ab_value,
+                        answers: shuffleArray(ab_value.answers),
+                    },
+                ];
             }
             setABQuestionnaire(ab_value);
         })();
