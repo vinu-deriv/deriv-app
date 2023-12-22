@@ -37,7 +37,9 @@ const AccountSignup = ({
     const [is_password_modal, setIsPasswordModal] = React.useState(false);
     const [is_disclaimer_accepted, setIsDisclaimerAccepted] = React.useState(false);
     const [is_questionnaire, setIsQuestionnaire] = React.useState(false);
-    const [ab_questionnaire, setABQuestionnaire] = React.useState(null);
+    const [ab_questionnaire, setABQuestionnaire] = React.useState(
+        Analytics.getFeatureValue('questionnaire-config', 'inactive')
+    );
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
     console.log(ab_questionnaire);
@@ -56,6 +58,7 @@ const AccountSignup = ({
         setPWInput(new_password);
     };
 
+    React.useEffect(() => {});
     // didMount lifecycle hook
     React.useEffect(() => {
         WS.wait('website_status', 'residence_list').then(() => {
@@ -64,8 +67,8 @@ const AccountSignup = ({
             }
             setIsLoading(false);
         });
-        (async () => {
-            let ab_value = await Analytics.getFeatureValue('questionnaire-config', 'inactive');
+        (() => {
+            let ab_value = ab_questionnaire;
             ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
             if (ab_value?.show_answers_in_random_order) {
                 ab_value = {
@@ -168,12 +171,6 @@ const AccountSignup = ({
                                     >
                                         {localize('Select your country and citizenship:')}
                                     </Text>
-                                    {ab_questionnaire && (
-                                        <QuestionnaireModal
-                                            ab_questionnaire={ab_questionnaire}
-                                            handleSignup={handleSignup}
-                                        />
-                                    )}
                                     <ResidenceForm
                                         class_prefix='account-signup'
                                         errors={errors}
