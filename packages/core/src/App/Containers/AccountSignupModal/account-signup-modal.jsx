@@ -42,7 +42,6 @@ const AccountSignup = ({
     );
     const [modded_state, setModdedState] = React.useState({});
     const language = getLanguage();
-    console.log(ab_questionnaire);
 
     const checkResidenceIsBrazil = selected_country =>
         selected_country && residence_list[indexOfSelection(selected_country)]?.value?.toLowerCase() === 'br';
@@ -58,7 +57,6 @@ const AccountSignup = ({
         setPWInput(new_password);
     };
 
-    React.useEffect(() => {});
     // didMount lifecycle hook
     React.useEffect(() => {
         WS.wait('website_status', 'residence_list').then(() => {
@@ -72,7 +70,7 @@ const AccountSignup = ({
             ab_value = ab_value?.[language] ?? ab_value?.EN ?? ab_value;
             if (ab_value?.show_answers_in_random_order) {
                 ab_value = [
-                    { ...ab_questionnaire['default'] },
+                    { ...ab_questionnaire.default },
                     {
                         ...ab_value,
                         answers: shuffleArray(ab_value.answers),
