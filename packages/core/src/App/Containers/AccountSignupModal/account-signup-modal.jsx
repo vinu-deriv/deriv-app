@@ -4,14 +4,15 @@ import PropTypes from 'prop-types';
 
 import { Button, Checkbox, Dialog, Loading, Text } from '@deriv/components';
 import { getLocation, SessionStore } from '@deriv/shared';
-import { localize } from '@deriv/translations';
+import { getLanguage, localize } from '@deriv/translations';
+import { Analytics } from '@deriv/analytics';
 
 import { WS } from 'Services';
 import { connect } from 'Stores/connect';
-import { Analytics } from '@deriv/analytics';
 
 import CitizenshipForm from '../CitizenshipModal/set-citizenship-form.jsx';
 import PasswordSelectionModal from '../PasswordSelectionModal/password-selection-modal.jsx';
+import QuestionnaireModal from '../QuestionnaireModal';
 import ResidenceForm from '../SetResidenceModal/set-residence-form.jsx';
 
 import validateSignupFields from './validate-signup-fields.jsx';
@@ -35,6 +36,11 @@ const AccountSignup = ({
     const [pw_input, setPWInput] = React.useState('');
     const [is_password_modal, setIsPasswordModal] = React.useState(false);
     const [is_disclaimer_accepted, setIsDisclaimerAccepted] = React.useState(false);
+    const [is_questionnaire, setIsQuestionnaire] = React.useState(false);
+    const [modded_state, setModdedState] = React.useState({});
+    const language = getLanguage();
+    let ab_questionnaire = Analytics.getFeatureValue('questionnaire-config', 'inactive');
+    ab_questionnaire = ab_questionnaire?.[language] ?? ab_questionnaire?.EN ?? ab_questionnaire;
 
     const checkResidenceIsBrazil = selected_country =>
         selected_country && residence_list[indexOfSelection(selected_country)]?.value?.toLowerCase() === 'br';
@@ -75,6 +81,8 @@ const AccountSignup = ({
     const indexOfSelection = selected_country =>
         residence_list.findIndex(item => item.text.toLowerCase() === selected_country?.toLowerCase());
 
+    const handleSignup = () => onSignup(modded_state, onSignupComplete);
+
     const onSignupPassthrough = values => {
         const index_of_selected_residence = indexOfSelection(values.residence);
         const index_of_selected_citizenship = indexOfSelection(values.citizenship);
@@ -84,8 +92,12 @@ const AccountSignup = ({
             residence: residence_list[index_of_selected_residence].value,
             citizenship: residence_list[index_of_selected_citizenship].value,
         };
+        setModdedState(modded_values);
 
-        onSignup(modded_values, onSignupComplete);
+        // a/b test
+        ab_questionnaire === 'inactive'
+            ? onSignup(modded_values, onSignupComplete)
+            : setIsQuestionnaire(!!ab_questionnaire);
     };
 
     const onSignupComplete = error => {
@@ -188,19 +200,28 @@ const AccountSignup = ({
                                     </div>
                                 </div>
                             ) : (
-                                <PasswordSelectionModal
-                                    api_error={api_error}
-                                    errors={errors}
-                                    handleBlur={handleBlur}
-                                    handleChange={handleChange}
-                                    isModalVisible={isModalVisible}
-                                    isSubmitting={isSubmitting}
-                                    touched={touched}
-                                    pw_input={pw_input}
-                                    setFieldTouched={setFieldTouched}
-                                    updatePassword={updatePassword}
-                                    values={values}
-                                />
+                                <React.Fragment>
+                                    {is_questionnaire ? (
+                                        <QuestionnaireModal
+                                            ab_questionnaire={ab_questionnaire}
+                                            handleSignup={handleSignup}
+                                        />
+                                    ) : (
+                                        <PasswordSelectionModal
+                                            api_error={api_error}
+                                            errors={errors}
+                                            handleBlur={handleBlur}
+                                            handleChange={handleChange}
+                                            isModalVisible={isModalVisible}
+                                            isSubmitting={isSubmitting}
+                                            touched={touched}
+                                            pw_input={pw_input}
+                                            setFieldTouched={setFieldTouched}
+                                            updatePassword={updatePassword}
+                                            values={values}
+                                        />
+                                    )}
+                                </React.Fragment>
                             )}
                         </Form>
                     )}
