@@ -95,12 +95,12 @@ const Trade = observer(() => {
                         </div>
                         {isAccumulatorContract(contract_type) && <AccumulatorStats />}
                     </div>
-                    <span className='trade__bottom'>
+                    <div className='trade__parameter'>
                         <TradeParametersContainer is_minimized_visible={is_minimized_params_visible} is_minimized>
                             <TradeParameters is_minimized />
                         </TradeParametersContainer>
                         <PurchaseButton />
-                    </span>
+                    </div>
                     {!guide_dtrader_v2 && <OnboardingGuide type='trade_page' />}
                 </React.Fragment>
             ) : (

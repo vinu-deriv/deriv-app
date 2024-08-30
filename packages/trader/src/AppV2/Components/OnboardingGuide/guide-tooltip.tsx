@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button, CaptionText, IconButton } from '@deriv-com/quill-ui';
+import { Button, CaptionText, IconButton, Text } from '@deriv-com/quill-ui';
 import { LabelPairedChevronsUpXlBoldIcon, LabelPairedXmarkSmBoldIcon } from '@deriv/quill-icons';
 import { Localize } from '@deriv/translations';
 import { TooltipRenderProps } from 'react-joyride';
 import { useSwipeable } from 'react-swipeable';
+import { setTime } from '@deriv/shared';
 
 export interface GuideTooltipProps extends TooltipRenderProps {
     setStepIndex: React.Dispatch<React.SetStateAction<number>>;
@@ -12,7 +13,7 @@ export interface GuideTooltipProps extends TooltipRenderProps {
 const GuideTooltip = ({ isLastStep, primaryProps, skipProps, step, tooltipProps, setStepIndex }: GuideTooltipProps) => {
     const swipe_handlers = useSwipeable({
         onSwipedUp: () => {
-            document.getElementsByClassName('trade__chart')[0].scrollIntoView();
+            document.querySelector('.trade__chart')?.scrollIntoView();
             setStepIndex((prev: number) => prev + 1);
         },
         preventDefaultTouchmoveEvent: true,
@@ -23,11 +24,10 @@ const GuideTooltip = ({ isLastStep, primaryProps, skipProps, step, tooltipProps,
     if (step.title === 'scroll-icon') {
         return (
             <div {...swipe_handlers} className='guide-tooltip__wrapper-scroll'>
-                <LabelPairedChevronsUpXlBoldIcon
-                    fill='var(--core-color-solid-slate-50)'
-                    className='guide-tooltip--bounce'
-                />
-                <Localize i18n_default_text='Swipe up to see the chart' />
+                <LabelPairedChevronsUpXlBoldIcon className='guide-tooltip--bounce' />
+                <Text size='sm' bold className='guide-tooltip__wrapper-scroll-text'>
+                    <Localize i18n_default_text='Swipe up to see the chart' />
+                </Text>
             </div>
         );
     }

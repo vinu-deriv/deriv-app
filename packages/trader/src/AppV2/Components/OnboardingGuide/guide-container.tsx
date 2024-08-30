@@ -66,7 +66,7 @@ const GuideContainer = ({ should_run, onFinishGuide }: TGuideContainerProps) => 
             disableBeacon: true,
             disableScrolling: false,
             offset: -4,
-            target: '.trade__bottom',
+            target: '.trade__parameter',
             title: <Localize i18n_default_text='Make quick adjustments (5/6)' />,
         },
         {
